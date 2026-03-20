@@ -98,7 +98,7 @@ class SpeedChartComponent extends HTMLElement {
   private setupDOM(): void {
     const wrapper = document.createElement("div");
     wrapper.style.cssText =
-      "background:#1a1d2e;border-radius:8px;padding:16px;position:relative;";
+      "background:#1a1d2e;border-radius:8px;padding:16px;position:relative;width:100%;";
 
     this.canvas = document.createElement("canvas");
     wrapper.appendChild(this.canvas);
@@ -160,14 +160,17 @@ class SpeedChartComponent extends HTMLElement {
           ctx.stroke();
           ctx.setLineDash([]);
 
+          const labelSize = window.innerWidth < 600 ? 10 : 12;
           ctx.fillStyle = "#00e5ff";
-          ctx.font = "bold 12px system-ui, sans-serif";
+          ctx.font = `bold ${labelSize}px system-ui, sans-serif`;
           ctx.textAlign = "center";
           ctx.fillText(sector.label, x, yScale.bottom + 20);
           ctx.restore();
         });
       },
     };
+
+    const isMobile = window.innerWidth < 600;
 
     const config: ChartConfiguration<"line"> = {
       type: "line",
@@ -203,17 +206,18 @@ class SpeedChartComponent extends HTMLElement {
             min: 0,
             max: computedMaxSpeed,
             title: {
-              display: true,
+              display: !isMobile,
               text: "Speed km/h",
               color: "#ccc",
-              font: { size: 14, family: "system-ui, sans-serif" },
+              font: { size: isMobile ? 10 : 14, family: "system-ui, sans-serif" },
             },
             grid: {
               color: "rgba(255,255,255,0.06)",
             },
             ticks: {
               color: "#aaa",
-              font: { size: 11 },
+              font: { size: isMobile ? 9 : 11 },
+              maxTicksLimit: isMobile ? 4 : 8,
             },
             border: {
               color: "rgba(255,255,255,0.1)",
@@ -224,8 +228,9 @@ class SpeedChartComponent extends HTMLElement {
           tooltip: {
             backgroundColor: "rgba(0,0,0,0.85)",
             titleColor: "#fff",
-            bodyFont: { size: 13 },
-            padding: 12,
+            bodyFont: { size: isMobile ? 11 : 13 },
+            titleFont: { size: isMobile ? 11 : 13 },
+            padding: isMobile ? 8 : 12,
             cornerRadius: 6,
             displayColors: false,
             callbacks: {
@@ -248,18 +253,16 @@ class SpeedChartComponent extends HTMLElement {
           },
         },
         layout: {
-          padding: { bottom: 24 },
+          padding: { bottom: isMobile ? 16 : 24, left: isMobile ? 0 : 8 },
         },
       },
       plugins: [sectorLinePlugin],
     };
 
     const wrapper = this.canvas.parentElement!;
-    wrapper.style.height = (this.getAttribute("height") || "400") + "px";
-    wrapper.style.width = (this.getAttribute("width") || "100%");
-    if (!wrapper.style.width.includes("%") && !wrapper.style.width.includes("px")) {
-      wrapper.style.width += "px";
-    }
+    const height = this.getAttribute("height") || "400";
+    wrapper.style.height = height + "px";
+    wrapper.style.maxWidth = "100%";
 
     this.chart = new Chart(this.canvas, config);
   }

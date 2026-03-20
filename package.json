@@ -1,6 +1,6 @@
 {
   "name": "chart-web-component",
-  "version": "2.0.0",
+  "version": "2.0.3",
   "description": "A telemetry speed chart web component using Chart.js",
   "main": "dist/chart-component.js",
   "types": "dist/chart-component.d.ts",

@@ -5,7 +5,7 @@ export default defineConfig({
     lib: {
       entry: "src/chart-component.ts",
       formats: ["es"],
-      fileName: "chart-component",
+      fileName: () => "chart-component.js",
     },
   },
 });
